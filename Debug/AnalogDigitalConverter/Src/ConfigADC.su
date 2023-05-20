@@ -1,1 +1,2 @@
-../AnalogDigitalConverter/Src/ConfigADC.c:6:6:handlerADC	16	static
+../AnalogDigitalConverter/Src/ConfigADC.c:3:10:averageVoltage	24	static
+../AnalogDigitalConverter/Src/ConfigADC.c:17:10:averageCurrent	24	static

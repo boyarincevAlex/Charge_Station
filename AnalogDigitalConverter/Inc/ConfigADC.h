@@ -3,6 +3,8 @@
 
 #include "stm32f1xx_hal.h"
 
-void handlerADC(ADC_HandleTypeDef *hadc1);
+uint16_t averageVoltage(ADC_HandleTypeDef *hadc1);
+
+uint16_t averageCurrent(ADC_HandleTypeDef *hadc1);
 
 #endif // __CONFIGADC_H

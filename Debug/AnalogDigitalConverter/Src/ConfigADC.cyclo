@@ -1,1 +1,2 @@
-ConfigADC.c:6:6:handlerADC	1
+ConfigADC.c:3:10:averageVoltage	1
+ConfigADC.c:17:10:averageCurrent	1
