@@ -12,6 +12,7 @@ RM := rm -rf
 -include Drivers/STM32F1xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
+-include AnalogDigitalConverter/Src/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -60,8 +61,8 @@ all: main-build
 main-build: Charge_Station.elf secondary-outputs
 
 # Tool invocations
-Charge_Station.elf Charge_Station.map: $(OBJS) $(USER_OBJS) G:\Project\workspace_1.12.0\Charge_Station\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Charge_Station.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"G:\Project\workspace_1.12.0\Charge_Station\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Charge_Station.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Charge_Station.elf Charge_Station.map: $(OBJS) $(USER_OBJS) C:\code\CubeIDE_Repositories\Charge_Station\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Charge_Station.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\code\CubeIDE_Repositories\Charge_Station\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Charge_Station.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
