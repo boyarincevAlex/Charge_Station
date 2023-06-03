@@ -3,10 +3,6 @@
 
 #include "stm32f1xx_hal.h"
 
-uint16_t averageAll(const uint16_t data);
-
-uint16_t averageVoltage(ADC_HandleTypeDef *hadc1);
-
-uint16_t averageCurrent(ADC_HandleTypeDef *hadc1);
+uint16_t averageAll(const uint16_t data[]);
 
 #endif // __CONFIGADC_H

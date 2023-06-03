@@ -49,7 +49,7 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
-volatile uint16_t voltage;
+uint16_t averageData;
 volatile uint16_t data[10] = {0,};
 /* USER CODE END PV */
 
@@ -300,7 +300,7 @@ static void MX_TIM2_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.OCMode = TIM_OCMODE_PWM2;
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -308,7 +308,6 @@ static void MX_TIM2_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
@@ -397,7 +396,6 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
@@ -414,7 +412,8 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
     if(hadc->Instance == ADC1)
     {
-
+    	averageData = averageAll(data);
+    	Update_Duty_Cycle(averageData/25.3);
     }
 }
 /* USER CODE END 4 */
