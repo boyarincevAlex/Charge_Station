@@ -6,6 +6,6 @@ main.c:264:13:MX_TIM2_Init	7
 main.c:328:13:MX_TIM4_Init	4
 main.c:374:13:MX_DMA_Init	1
 main.c:392:13:MX_GPIO_Init	1
-main.c:406:6:Update_Duty_Cycle	1
-main.c:412:6:HAL_ADC_ConvCpltCallback	2
-main.c:426:6:Error_Handler	1
+main.c:417:6:Update_Duty_Cycle	1
+main.c:423:6:HAL_ADC_ConvCpltCallback	2
+main.c:438:6:Error_Handler	1
