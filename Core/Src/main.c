@@ -32,7 +32,9 @@ PID_TypeDef VoltagePID;
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+double LOW_VOLTAGE = 0;
+double HIGH_VOLTAGE = 3.3;
+double UNIT_DUTY_CYCLE = 4096/162;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -115,11 +117,11 @@ int main(void)
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   Update_Duty_Cycle(50);
 
-  PID(&VoltagePID, &inputDutyCycle, &outputDutyCycle, &setpointDutyCycle, 0, 0, 0, _PID_P_ON_E, _PID_CD_DIRECT);
+  PID(&VoltagePID, &inputDutyCycle, &outputDutyCycle, &setpointDutyCycle, 1, 0, 0, _PID_P_ON_E, _PID_CD_DIRECT);
 
   PID_SetMode(&VoltagePID, _PID_MODE_AUTOMATIC);
   PID_SetSampleTime(&VoltagePID, 100);
-  PID_SetOutputLimits(&VoltagePID, 0, 162);
+  PID_SetOutputLimits(&VoltagePID, LOW_VOLTAGE, HIGH_VOLTAGE);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -421,9 +423,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
     if(hadc->Instance == ADC1)
     {
     	uint16_t averageData = averageAll(data);
-    	inputDutyCycle = adcToDutyCycle(averageData);
+    	inputDutyCycle = adcToVoltage(averageData);
     	PID_Compute(&VoltagePID);
-    	Update_Duty_Cycle(outputDutyCycle);
+    	Update_Duty_Cycle(outputDutyCycle/UNIT_DUTY_CYCLE);
     }
 }
 /* USER CODE END 4 */
