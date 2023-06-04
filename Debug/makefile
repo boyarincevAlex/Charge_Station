@@ -9,6 +9,7 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include Regulator/Src/subdir.mk
 -include Drivers/STM32F1xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
@@ -53,6 +54,9 @@ default.size.stdout \
 OBJDUMP_LIST += \
 Charge_Station.list \
 
+OBJCOPY_HEX += \
+Charge_Station.hex \
+
 
 # All Target
 all: main-build
@@ -61,8 +65,8 @@ all: main-build
 main-build: Charge_Station.elf secondary-outputs
 
 # Tool invocations
-Charge_Station.elf Charge_Station.map: $(OBJS) $(USER_OBJS) C:\Diplom\Charge_Station\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Charge_Station.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Diplom\Charge_Station\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Charge_Station.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Charge_Station.elf Charge_Station.map: $(OBJS) $(USER_OBJS) C:\code\CubeIDE_Repositories\Charge_Station\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Charge_Station.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\code\CubeIDE_Repositories\Charge_Station\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Charge_Station.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -76,12 +80,17 @@ Charge_Station.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+Charge_Station.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "Charge_Station.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) Charge_Station.elf Charge_Station.list Charge_Station.map default.size.stdout
+	-$(RM) Charge_Station.elf Charge_Station.hex Charge_Station.list Charge_Station.map default.size.stdout
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

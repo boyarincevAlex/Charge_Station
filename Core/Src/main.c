@@ -22,11 +22,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "ConfigADC.h"
+#include "pid.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+PID_TypeDef VoltagePID;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -49,7 +50,9 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
-uint16_t averageData;
+double inputDutyCycle;
+double outputDutyCycle;
+double setpointDutyCycle = 122;
 volatile uint16_t data[10] = {0,};
 /* USER CODE END PV */
 
@@ -104,15 +107,19 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-
   HAL_ADCEx_Calibration_Start(&hadc1);
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&data, 10);
-//  HAL_TIM_Base_Start(&htim3);
   HAL_TIM_OC_Start(&htim4, TIM_CHANNEL_4);
 
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   Update_Duty_Cycle(50);
+
+  PID(&VoltagePID, &inputDutyCycle, &outputDutyCycle, &setpointDutyCycle, 0, 0, 0, _PID_P_ON_E, _PID_CD_DIRECT);
+
+  PID_SetMode(&VoltagePID, _PID_MODE_AUTOMATIC);
+  PID_SetSampleTime(&VoltagePID, 100);
+  PID_SetOutputLimits(&VoltagePID, 0, 162);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -413,8 +420,10 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
     if(hadc->Instance == ADC1)
     {
-    	averageData = averageAll(data);
-    	Update_Duty_Cycle(averageData/25.3);
+    	uint16_t averageData = averageAll(data);
+    	inputDutyCycle = adcToDutyCycle(averageData);
+    	PID_Compute(&VoltagePID);
+    	Update_Duty_Cycle(outputDutyCycle);
     }
 }
 /* USER CODE END 4 */

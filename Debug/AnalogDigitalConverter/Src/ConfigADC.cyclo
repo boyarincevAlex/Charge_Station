@@ -1,1 +1,2 @@
 ConfigADC.c:3:10:averageAll	2
+ConfigADC.c:16:10:adcToDutyCycle	1
