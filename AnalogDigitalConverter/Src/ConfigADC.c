@@ -26,3 +26,13 @@ double adcToVoltage(const uint16_t averageData)
 
 	return result;
 }
+
+double voltageToDutyCycle(const double outputDutyCycle)
+{
+	double result;
+
+	double coef = 3.3/162;
+	result = outputDutyCycle*coef;
+
+	return result;
+}

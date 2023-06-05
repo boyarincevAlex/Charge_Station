@@ -20,7 +20,7 @@ void PID_Init(PID_TypeDef *uPID)
 	
 }
 
-void PID(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDPON_TypeDef POn, PIDCD_TypeDef ControllerDirection)
+void PID(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDPON_TypeDef POn, PIDCD_TypeDef ControllerDirection, uint16_t us)
 {
 	/* ~~~~~~~~~~ Set parameter ~~~~~~~~~~ */
 	uPID->MyOutput   = Output;
@@ -35,17 +35,17 @@ void PID(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, dou
 	PID_SetControllerDirection(uPID, ControllerDirection);
 	PID_SetTunings2(uPID, Kp, Ki, Kd, POn);
 	
-	uPID->LastTime = GetTime() - uPID->SampleTime;
+	uPID->LastTime = us - uPID->SampleTime;
 	
 }
 
-void PID2(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDCD_TypeDef ControllerDirection)
-{
-	PID(uPID, Input, Output, Setpoint, Kp, Ki, Kd, _PID_P_ON_E, ControllerDirection);
-}
+//void PID2(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDCD_TypeDef ControllerDirection)
+//{
+//	PID(uPID, Input, Output, Setpoint, Kp, Ki, Kd, _PID_P_ON_E, ControllerDirection);
+//}
 
 /* ~~~~~~~~~~~~~~~~~ Computing ~~~~~~~~~~~~~~~~~ */
-uint8_t PID_Compute(PID_TypeDef *uPID)
+uint8_t PID_Compute(PID_TypeDef *uPID, uint16_t us)
 {
 	
 	uint32_t now;
@@ -63,7 +63,7 @@ uint8_t PID_Compute(PID_TypeDef *uPID)
 	}
 	
 	/* ~~~~~~~~~~ Calculate time ~~~~~~~~~~ */
-	now        = GetTime();
+	now        = us;
 	timeChange = (now - uPID->LastTime);
 	
 	if (timeChange >= uPID->SampleTime)

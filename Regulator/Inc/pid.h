@@ -204,11 +204,11 @@ typedef struct
 /* :::::::::::::: Init ::::::::::::: */
 void PID_Init(PID_TypeDef *uPID);
 
-void PID(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDPON_TypeDef POn, PIDCD_TypeDef ControllerDirection);
-void PID2(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDCD_TypeDef ControllerDirection);
+void PID(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDPON_TypeDef POn, PIDCD_TypeDef ControllerDirection, uint16_t us);
+//void PID2(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDCD_TypeDef ControllerDirection);
 
 /* ::::::::::: Computing ::::::::::: */
-uint8_t PID_Compute(PID_TypeDef *uPID);
+uint8_t PID_Compute(PID_TypeDef *uPID, uint16_t us);
 
 /* ::::::::::: PID Mode :::::::::::: */
 void            PID_SetMode(PID_TypeDef *uPID, PIDMode_TypeDef Mode);

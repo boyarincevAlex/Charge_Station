@@ -34,7 +34,7 @@ PID_TypeDef VoltagePID;
 /* USER CODE BEGIN PD */
 double LOW_VOLTAGE = 0;
 double HIGH_VOLTAGE = 3.3;
-double UNIT_DUTY_CYCLE = 4096/162;
+double UNIT_DUTY_CYCLE = 162/3.3;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -49,12 +49,15 @@ DMA_HandleTypeDef hdma_adc1;
 CAN_HandleTypeDef hcan;
 
 TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
+uint16_t time_us = 0;
+float tempDutyCycle = 0;
 double inputDutyCycle;
 double outputDutyCycle;
-double setpointDutyCycle = 122;
+double setpointDutyCycle = 3.1;
 volatile uint16_t data[10] = {0,};
 /* USER CODE END PV */
 
@@ -66,6 +69,7 @@ static void MX_CAN_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM4_Init(void);
+static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -108,16 +112,17 @@ int main(void)
   MX_TIM2_Init();
   MX_ADC1_Init();
   MX_TIM4_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   HAL_ADCEx_Calibration_Start(&hadc1);
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&data, 10);
   HAL_TIM_OC_Start(&htim4, TIM_CHANNEL_4);
-
+  HAL_TIM_Base_Start(&htim3);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   Update_Duty_Cycle(50);
-
-  PID(&VoltagePID, &inputDutyCycle, &outputDutyCycle, &setpointDutyCycle, 1, 0, 0, _PID_P_ON_E, _PID_CD_DIRECT);
+  time_us = TIM3->CNT;
+  PID(&VoltagePID, &inputDutyCycle, &outputDutyCycle, &setpointDutyCycle, 2, 0, 0, _PID_P_ON_E, _PID_CD_DIRECT, time_us);
 
   PID_SetMode(&VoltagePID, _PID_MODE_AUTOMATIC);
   PID_SetSampleTime(&VoltagePID, 100);
@@ -330,6 +335,51 @@ static void MX_TIM2_Init(void)
 }
 
 /**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM3_Init(void)
+{
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = 35;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 65535;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
+
+}
+
+/**
   * @brief TIM4 Initialization Function
   * @param None
   * @retval None
@@ -416,16 +466,19 @@ void Update_Duty_Cycle(uint16_t DutyCycle)
 {
     TIM2->CCR2=DutyCycle;
     TIM2->CCR1=TIM2->ARR-TIM2->CCR2;
+//    TIM3->CNT;
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
     if(hadc->Instance == ADC1)
     {
+    	time_us = TIM3->CNT;
     	uint16_t averageData = averageAll(data);
     	inputDutyCycle = adcToVoltage(averageData);
-    	PID_Compute(&VoltagePID);
-    	Update_Duty_Cycle(outputDutyCycle/UNIT_DUTY_CYCLE);
+    	PID_Compute(&VoltagePID, time_us);
+    	tempDutyCycle = outputDutyCycle*UNIT_DUTY_CYCLE;
+    	Update_Duty_Cycle(tempDutyCycle);
     }
 }
 /* USER CODE END 4 */
