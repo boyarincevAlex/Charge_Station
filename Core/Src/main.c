@@ -77,6 +77,7 @@ static void MX_TIM3_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void Update_Duty_Cycle(uint16_t DutyCycle);
+uint16_t GetTime();
 /* USER CODE END 0 */
 
 /**
@@ -121,7 +122,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   Update_Duty_Cycle(50);
-  time_us = TIM3->CNT;
+  time_us = GetTime();
   PID(&VoltagePID, &inputDutyCycle, &outputDutyCycle, &setpointDutyCycle, 2, 0, 0, _PID_P_ON_E, _PID_CD_DIRECT, time_us);
 
   PID_SetMode(&VoltagePID, _PID_MODE_AUTOMATIC);
@@ -469,11 +470,15 @@ void Update_Duty_Cycle(uint16_t DutyCycle)
 //    TIM3->CNT;
 }
 
+uint16_t GetTime()
+{
+    return TIM3->CNT;
+}
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
     if(hadc->Instance == ADC1)
     {
-    	time_us = TIM3->CNT;
+    	time_us = GetTime();
     	uint16_t averageData = averageAll(data);
     	inputDutyCycle = adcToVoltage(averageData);
     	PID_Compute(&VoltagePID, time_us);
