@@ -1,3 +1,2 @@
 ../AnalogDigitalConverter/Src/ConfigADC.c:3:10:averageAll	32	static
-../AnalogDigitalConverter/Src/ConfigADC.c:16:8:adcToVoltage	40	static
-../AnalogDigitalConverter/Src/ConfigADC.c:30:8:voltageToDutyCycle	32	static
+../AnalogDigitalConverter/Src/ConfigADC.c:16:8:adcToVoltage	16	static

@@ -105,33 +105,33 @@
 #endif
 
 /* ---------------------- By compiler ---------------------- */
-#ifndef GetTime
-
-	/* ---------------------- By compiler ---------------------- */
-
-	#ifdef __CODEVISIONAVR__  /* Check compiler */
-
-		#define GetTime()   0
-
-	/* ------------------------------------------------------------------ */
-
-	#elif defined(__GNUC__) && !defined(USE_HAL_DRIVER)  /* Check compiler */
-
-		#define GetTime()   0
-
-	/* ------------------------------------------------------------------ */
-
-	#elif defined(USE_HAL_DRIVER)  /* Check driver */
-
-		#define GetTime()   HAL_GetTick()
-
-	/* ------------------------------------------------------------------ */
-
-	#else
-	#endif /* __CODEVISIONAVR__ */
-	/* ------------------------------------------------------------------ */
-
-#endif
+//#ifndef GetTime
+//
+//	/* ---------------------- By compiler ---------------------- */
+//
+//	#ifdef __CODEVISIONAVR__  /* Check compiler */
+//
+//		#define GetTime()   0
+//
+//	/* ------------------------------------------------------------------ */
+//
+//	#elif defined(__GNUC__) && !defined(USE_HAL_DRIVER)  /* Check compiler */
+//
+//		#define GetTime()   0
+//
+//	/* ------------------------------------------------------------------ */
+//
+//	#elif defined(USE_HAL_DRIVER)  /* Check driver */
+//
+//		#define GetTime()   HAL_GetTick()
+//
+//	/* ------------------------------------------------------------------ */
+//
+//	#else
+//	#endif /* __CODEVISIONAVR__ */
+//	/* ------------------------------------------------------------------ */
+//
+//#endif
 
 /* --------------------------------------------------------- */
 
@@ -189,7 +189,7 @@ typedef struct
 	double          *MySetpoint;
 
 	double          OutputSum;
-	double          LastInput;
+	double          LastError;
 
 	double          OutMin;
 	double          OutMax;
@@ -204,11 +204,11 @@ typedef struct
 /* :::::::::::::: Init ::::::::::::: */
 void PID_Init(PID_TypeDef *uPID);
 
-void PID(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDPON_TypeDef POn, PIDCD_TypeDef ControllerDirection, uint16_t us);
+void PID(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDPON_TypeDef POn, PIDCD_TypeDef ControllerDirection);
 //void PID2(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDCD_TypeDef ControllerDirection);
 
 /* ::::::::::: Computing ::::::::::: */
-uint8_t PID_Compute(PID_TypeDef *uPID, uint16_t us);
+uint8_t PID_Compute(PID_TypeDef *uPID);
 
 /* ::::::::::: PID Mode :::::::::::: */
 void            PID_SetMode(PID_TypeDef *uPID, PIDMode_TypeDef Mode);

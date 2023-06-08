@@ -33,8 +33,8 @@ PID_TypeDef VoltagePID;
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 double LOW_VOLTAGE = 0;
-double HIGH_VOLTAGE = 3.3;
-double UNIT_DUTY_CYCLE = 162/3.3;
+double HIGH_VOLTAGE = 0.65;
+double UNIT_DUTY_CYCLE = 162/0.3;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -52,12 +52,14 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
 
+UART_HandleTypeDef huart1;
+
 /* USER CODE BEGIN PV */
 uint16_t time_us = 0;
 float tempDutyCycle = 0;
-double inputDutyCycle;
-double outputDutyCycle;
-double setpointDutyCycle = 3.1;
+double inputVoltageADC;
+double outputVoltageADC;
+double setpointVoltageADC = 0.5;
 volatile uint16_t data[10] = {0,};
 /* USER CODE END PV */
 
@@ -70,6 +72,7 @@ static void MX_TIM2_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_TIM3_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -77,7 +80,7 @@ static void MX_TIM3_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void Update_Duty_Cycle(uint16_t DutyCycle);
-uint16_t GetTime();
+
 /* USER CODE END 0 */
 
 /**
@@ -114,6 +117,7 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM4_Init();
   MX_TIM3_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_ADCEx_Calibration_Start(&hadc1);
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&data, 10);
@@ -122,8 +126,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   Update_Duty_Cycle(50);
-  time_us = GetTime();
-  PID(&VoltagePID, &inputDutyCycle, &outputDutyCycle, &setpointDutyCycle, 2, 0, 0, _PID_P_ON_E, _PID_CD_DIRECT, time_us);
+  PID(&VoltagePID, &inputVoltageADC, &outputVoltageADC, &setpointVoltageADC, 2, 0, 0, _PID_P_ON_E, _PID_CD_DIRECT);
 
   PID_SetMode(&VoltagePID, _PID_MODE_AUTOMATIC);
   PID_SetSampleTime(&VoltagePID, 100);
@@ -199,6 +202,7 @@ static void MX_ADC1_Init(void)
 
   /* USER CODE END ADC1_Init 0 */
 
+  ADC_AnalogWDGConfTypeDef AnalogWDGConfig = {0};
   ADC_ChannelConfTypeDef sConfig = {0};
 
   /* USER CODE BEGIN ADC1_Init 1 */
@@ -213,8 +217,20 @@ static void MX_ADC1_Init(void)
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T4_CC4;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.NbrOfConversion = 2;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Analog WatchDog 1
+  */
+  AnalogWDGConfig.WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_REG;
+  AnalogWDGConfig.HighThreshold = 0;
+  AnalogWDGConfig.LowThreshold = 0;
+  AnalogWDGConfig.Channel = ADC_CHANNEL_4;
+  AnalogWDGConfig.ITMode = DISABLE;
+  if (HAL_ADC_AnalogWDGConfig(&hadc1, &AnalogWDGConfig) != HAL_OK)
   {
     Error_Handler();
   }
@@ -224,6 +240,15 @@ static void MX_ADC1_Init(void)
   sConfig.Channel = ADC_CHANNEL_4;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_5;
+  sConfig.Rank = ADC_REGULAR_RANK_2;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -429,6 +454,39 @@ static void MX_TIM4_Init(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * Enable DMA controller clock
   */
 static void MX_DMA_Init(void)
@@ -470,19 +528,19 @@ void Update_Duty_Cycle(uint16_t DutyCycle)
 //    TIM3->CNT;
 }
 
-uint16_t GetTime()
+uint16_t GetTickUs()
 {
     return TIM3->CNT;
 }
+
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
     if(hadc->Instance == ADC1)
     {
-    	time_us = GetTime();
     	uint16_t averageData = averageAll(data);
-    	inputDutyCycle = adcToVoltage(averageData);
-    	PID_Compute(&VoltagePID, time_us);
-    	tempDutyCycle = outputDutyCycle*UNIT_DUTY_CYCLE;
+    	inputVoltageADC = adcToVoltage(averageData);
+    	PID_Compute(&VoltagePID);
+    	tempDutyCycle = outputVoltageADC*UNIT_DUTY_CYCLE;
     	Update_Duty_Cycle(tempDutyCycle);
     }
 }

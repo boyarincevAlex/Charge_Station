@@ -7,6 +7,4 @@ uint16_t averageAll(const uint16_t data[]);
 
 double adcToVoltage(const uint16_t averageData);
 
-double voltageToDutyCycle(const double outputDutyCycle);
-
 #endif // __CONFIGADC_H

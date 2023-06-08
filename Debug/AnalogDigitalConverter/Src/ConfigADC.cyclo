@@ -1,3 +1,2 @@
 ConfigADC.c:3:10:averageAll	2
 ConfigADC.c:16:8:adcToVoltage	1
-ConfigADC.c:30:8:voltageToDutyCycle	1

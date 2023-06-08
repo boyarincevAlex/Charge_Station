@@ -15,24 +15,5 @@ uint16_t averageAll(const uint16_t data[])
 
 double adcToVoltage(const uint16_t averageData)
 {
-	double result;
-
-	uint16_t R1 = 1; 	//1 kOm 	Параметры делителя напряжения
-	uint16_t R2 = 100;	//100 kOm
-	uint16_t divider = 100/1;
-
-	double coef = 3.3/4096;
-	result = averageData*coef;
-
-	return result;
-}
-
-double voltageToDutyCycle(const double outputDutyCycle)
-{
-	double result;
-
-	double coef = 3.3/162;
-	result = outputDutyCycle*coef;
-
-	return result;
+	return 3.3*averageData/4096;
 }

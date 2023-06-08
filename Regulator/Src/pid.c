@@ -6,7 +6,7 @@ void PID_Init(PID_TypeDef *uPID)
 {
 	/* ~~~~~~~~~~ Set parameter ~~~~~~~~~~ */
 	uPID->OutputSum = *uPID->MyOutput;
-	uPID->LastInput = *uPID->MyInput;
+	uPID->LastError = *uPID->MySetpoint - *uPID->MyInput;
 	
 	if (uPID->OutputSum > uPID->OutMax)
 	{
@@ -20,7 +20,7 @@ void PID_Init(PID_TypeDef *uPID)
 	
 }
 
-void PID(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDPON_TypeDef POn, PIDCD_TypeDef ControllerDirection, uint16_t us)
+void PID(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDPON_TypeDef POn, PIDCD_TypeDef ControllerDirection)
 {
 	/* ~~~~~~~~~~ Set parameter ~~~~~~~~~~ */
 	uPID->MyOutput   = Output;
@@ -35,7 +35,7 @@ void PID(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, dou
 	PID_SetControllerDirection(uPID, ControllerDirection);
 	PID_SetTunings2(uPID, Kp, Ki, Kd, POn);
 	
-	uPID->LastTime = us - uPID->SampleTime;
+	uPID->LastTime = GetTickUs() - uPID->SampleTime;
 	
 }
 
@@ -45,7 +45,7 @@ void PID(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, dou
 //}
 
 /* ~~~~~~~~~~~~~~~~~ Computing ~~~~~~~~~~~~~~~~~ */
-uint8_t PID_Compute(PID_TypeDef *uPID, uint16_t us)
+uint8_t PID_Compute(PID_TypeDef *uPID)
 {
 	
 	uint32_t now;
@@ -53,7 +53,7 @@ uint8_t PID_Compute(PID_TypeDef *uPID, uint16_t us)
 	
 	double input;
 	double error;
-	double dInput;
+	double dError;
 	double output;
 	
 	/* ~~~~~~~~~~ Check PID mode ~~~~~~~~~~ */
@@ -63,7 +63,7 @@ uint8_t PID_Compute(PID_TypeDef *uPID, uint16_t us)
 	}
 	
 	/* ~~~~~~~~~~ Calculate time ~~~~~~~~~~ */
-	now        = us;
+	now        = GetTickUs();
 	timeChange = (now - uPID->LastTime);
 	
 	if (timeChange >= uPID->SampleTime)
@@ -71,14 +71,14 @@ uint8_t PID_Compute(PID_TypeDef *uPID, uint16_t us)
 		/* ..... Compute all the working error variables ..... */
 		input   = *uPID->MyInput;
 		error   = *uPID->MySetpoint - input;
-		dInput  = (input - uPID->LastInput);
+		dError  = error - uPID->LastError; //dErr = (*uPID->MySetpoint - input) - (*uPID->MySetpoint - LastInput)
 		
-		uPID->OutputSum     += (uPID->Ki * error);
+		uPID->OutputSum += (uPID->Ki * error);
 		
 		/* ..... Add Proportional on Measurement, if P_ON_M is specified ..... */
 		if (!uPID->POnE)
 		{
-			uPID->OutputSum -= uPID->Kp * dInput;
+			uPID->OutputSum -= uPID->Kp * dError;
 		}
 		
 		if (uPID->OutputSum > uPID->OutMax)
@@ -89,7 +89,6 @@ uint8_t PID_Compute(PID_TypeDef *uPID, uint16_t us)
 		{
 			uPID->OutputSum = uPID->OutMin;
 		}
-		else { }
 		
 		/* ..... Add Proportional on Error, if P_ON_E is specified ..... */
 		if (uPID->POnE)
@@ -102,7 +101,7 @@ uint8_t PID_Compute(PID_TypeDef *uPID, uint16_t us)
 		}
 		
 		/* ..... Compute Rest of PID Output ..... */
-		output += uPID->OutputSum - uPID->Kd * dInput;
+		output += uPID->OutputSum + uPID->Kd * dError;
 		
 		if (output > uPID->OutMax)
 		{
@@ -112,12 +111,11 @@ uint8_t PID_Compute(PID_TypeDef *uPID, uint16_t us)
 		{
 			output = uPID->OutMin;
 		}
-		else { }
 		
 		*uPID->MyOutput = output;
 		
 		/* ..... Remember some variables for next time ..... */
-		uPID->LastInput = input;
+		uPID->LastError = error;
 		uPID->LastTime = now;
 		
 		return _TRUE;
@@ -131,7 +129,7 @@ uint8_t PID_Compute(PID_TypeDef *uPID, uint16_t us)
 }
 
 /* ~~~~~~~~~~~~~~~~~ PID Mode ~~~~~~~~~~~~~~~~~~ */
-void            PID_SetMode(PID_TypeDef *uPID, PIDMode_TypeDef Mode)
+void PID_SetMode(PID_TypeDef *uPID, PIDMode_TypeDef Mode)
 {
 	
 	uint8_t newAuto = (Mode == _PID_MODE_AUTOMATIC);
@@ -236,7 +234,7 @@ void PID_SetTunings2(PID_TypeDef *uPID, double Kp, double Ki, double Kd, PIDPON_
 }
 
 /* ~~~~~~~~~~~~~~~ PID Direction ~~~~~~~~~~~~~~~ */
-void          PID_SetControllerDirection(PID_TypeDef *uPID, PIDCD_TypeDef Direction)
+void PID_SetControllerDirection(PID_TypeDef *uPID, PIDCD_TypeDef Direction)
 {
 	/* ~~~~~~~~~~ Check parameters ~~~~~~~~~~ */
 	if ((uPID->InAuto) && (Direction !=uPID->ControllerDirection))
