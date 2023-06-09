@@ -119,18 +119,20 @@ int main(void)
   MX_TIM3_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_ADCEx_Calibration_Start(&hadc1);
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&data, 10);
-  HAL_TIM_OC_Start(&htim4, TIM_CHANNEL_4);
-  HAL_TIM_Base_Start(&htim3);
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   Update_Duty_Cycle(50);
-  PID(&VoltagePID, &inputVoltageADC, &outputVoltageADC, &setpointVoltageADC, 2, 0, 0, _PID_P_ON_E, _PID_CD_DIRECT);
 
+  PID(&VoltagePID, &inputVoltageADC, &outputVoltageADC, &setpointVoltageADC, 2, 0, 0, _PID_P_ON_E, _PID_CD_DIRECT);
   PID_SetMode(&VoltagePID, _PID_MODE_AUTOMATIC);
   PID_SetSampleTime(&VoltagePID, 100);
   PID_SetOutputLimits(&VoltagePID, LOW_VOLTAGE, HIGH_VOLTAGE);
+
+  HAL_ADCEx_Calibration_Start(&hadc1);
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&data, 10);
+  HAL_TIM_OC_Start(&htim4, TIM_CHANNEL_4);
+
+  HAL_TIM_Base_Start(&htim3);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -212,12 +214,12 @@ static void MX_ADC1_Init(void)
   /** Common config
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T4_CC4;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 2;
+  hadc1.Init.NbrOfConversion = 1;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
     Error_Handler();
@@ -240,15 +242,6 @@ static void MX_ADC1_Init(void)
   sConfig.Channel = ADC_CHANNEL_4;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure Regular Channel
-  */
-  sConfig.Channel = ADC_CHANNEL_5;
-  sConfig.Rank = ADC_REGULAR_RANK_2;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -316,7 +309,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 0;
+  htim2.Init.Prescaler = 3;
   htim2.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
   htim2.Init.Period = 359;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
