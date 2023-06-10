@@ -1,6 +1,6 @@
 AnalogDigitalConverter/Src/ConfigADC.o: \
  ../AnalogDigitalConverter/Src/ConfigADC.c \
- C:/cubeIDE_Projects/Charge_Station/AnalogDigitalConverter/Inc/ConfigADC.h \
+ G:/Project/workspace_1.12.0/Charge_Station/AnalogDigitalConverter/Inc/ConfigADC.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  ../Core/Inc/stm32f1xx_hal_conf.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
@@ -29,7 +29,7 @@ AnalogDigitalConverter/Src/ConfigADC.o: \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
-C:/cubeIDE_Projects/Charge_Station/AnalogDigitalConverter/Inc/ConfigADC.h:
+G:/Project/workspace_1.12.0/Charge_Station/AnalogDigitalConverter/Inc/ConfigADC.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h:

@@ -33,8 +33,8 @@ PID_TypeDef VoltagePID;
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 double LOW_VOLTAGE = 0;
-double HIGH_VOLTAGE = 0.65;
-double UNIT_DUTY_CYCLE = 162/0.3;
+double HIGH_VOLTAGE = 0.96;
+double UNIT_DUTY_CYCLE = 162/0.96;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -59,7 +59,7 @@ uint16_t time_us = 0;
 float tempDutyCycle = 0;
 double inputVoltageADC;
 double outputVoltageADC;
-double setpointVoltageADC = 0.5;
+double setpointVoltageADC = 0.8;
 volatile uint16_t data[10] = {0,};
 /* USER CODE END PV */
 
@@ -119,11 +119,11 @@ int main(void)
   MX_TIM3_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  Update_Duty_Cycle(50);
+  //Update_Duty_Cycle(50);
 
-  PID(&VoltagePID, &inputVoltageADC, &outputVoltageADC, &setpointVoltageADC, 2, 0, 0, _PID_P_ON_E, _PID_CD_DIRECT);
+  PID(&VoltagePID, &inputVoltageADC, &outputVoltageADC, &setpointVoltageADC, 0.5, 1000, 0.000001, _PID_P_ON_E, _PID_CD_DIRECT);
   PID_SetMode(&VoltagePID, _PID_MODE_AUTOMATIC);
-  PID_SetSampleTime(&VoltagePID, 100);
+  PID_SetSampleTime(&VoltagePID, 40);
   PID_SetOutputLimits(&VoltagePID, LOW_VOLTAGE, HIGH_VOLTAGE);
 
   HAL_ADCEx_Calibration_Start(&hadc1);
@@ -419,7 +419,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 0;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 359;
+  htim4.Init.Period = 143;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_OC_Init(&htim4) != HAL_OK)
@@ -535,6 +535,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
     	PID_Compute(&VoltagePID);
     	tempDutyCycle = outputVoltageADC*UNIT_DUTY_CYCLE;
     	Update_Duty_Cycle(tempDutyCycle);
+    	//Update_Duty_Cycle(162);
     }
 }
 /* USER CODE END 4 */

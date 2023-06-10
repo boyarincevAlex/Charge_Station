@@ -27,8 +27,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
- C:/cubeIDE_Projects/Charge_Station/AnalogDigitalConverter/Inc/ConfigADC.h \
- C:/cubeIDE_Projects/Charge_Station/Regulator/Inc/pid.h
+ G:/Project/workspace_1.12.0/Charge_Station/AnalogDigitalConverter/Inc/ConfigADC.h \
+ G:/Project/workspace_1.12.0/Charge_Station/Regulator/Inc/pid.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
@@ -58,5 +58,5 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h:
-C:/cubeIDE_Projects/Charge_Station/AnalogDigitalConverter/Inc/ConfigADC.h:
-C:/cubeIDE_Projects/Charge_Station/Regulator/Inc/pid.h:
+G:/Project/workspace_1.12.0/Charge_Station/AnalogDigitalConverter/Inc/ConfigADC.h:
+G:/Project/workspace_1.12.0/Charge_Station/Regulator/Inc/pid.h:

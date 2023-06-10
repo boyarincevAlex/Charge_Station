@@ -90,7 +90,7 @@
 
 /* ------------------------ Public ------------------------- */
 #define _PID_8BIT_PWM_MAX       UINT8_MAX
-#define _PID_SAMPLE_TIME_MS_DEF 100
+#define _PID_SAMPLE_TIME_MS_DEF 10
 
 #ifndef _FALSE
 

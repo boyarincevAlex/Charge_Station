@@ -11,4 +11,4 @@ main.c:503:13:MX_GPIO_Init	1
 main.c:517:6:Update_Duty_Cycle	1
 main.c:524:10:GetTickUs	1
 main.c:529:6:HAL_ADC_ConvCpltCallback	2
-main.c:546:6:Error_Handler	1
+main.c:547:6:Error_Handler	1
